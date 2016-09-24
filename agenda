@@ -1,0 +1,139 @@
+#!/bin/bash
+
+# agenda
+# (projeto agenda telefonica 'Cadeira de ShellScript' - segundo semestre 2013)
+
+listar() {
+clear
+sort lista_ag | nl | more -d
+}
+
+##############################################################
+#Adicionar nomes
+
+adicionar() {
+clear
+echo "Digite o nome do contato:*"
+read p_nom
+
+while [ -z "$p_nom" ]
+  do
+if [ -z "$p_nom" ]
+  then
+  echo "Você esqueceu de escrever o nome!"
+  echo "(Este campo é obrigatório)"
+  echo "Você pode pressionar Ctrl+c para cancelar"
+  echo "Digite o nome do contato:"
+ read p_nom
+fi
+done
+
+echo "Digite o número do telefone:*"
+ read num_tel
+
+while [ -z "$num_tel" ]
+ do
+if [ -z "$num_tel" ]
+then
+  echo "Você se esqueceu de escrever o número do telefone!"
+  echo "(Este campo é obrigatório)"
+  echo "Você pode pressionar Ctrl+c para cancelar"
+  echo "Digite o número do telefone:"
+read num_tel
+fi
+
+done
+clear
+echo "O contato foi adicionado."
+
+
+echo  $p_nom $num_tel >> lista_ag
+}
+
+procurar() {
+clear
+echo "Digite o nome ou número que deseja procurar"
+echo "Você pode digitar parte do nome ou número"
+read pesquisa
+sed = lista_ag
+grep --ignore-case -e $pesquisa lista_ag | sort | nl
+
+}
+
+editar() {
+apagar
+adicionar
+
+}
+
+apagar() {
+clear
+sort lista_ag | nl
+echo "Pressione Shift+PgUp ou Shift+PgDn para ver a lista"
+echo "Qual a linha deseja deletar?"
+
+
+read deletar
+
+while [ -z $deletar ]
+ do
+echo "Você não escreveu nada"
+  echo "Você pode pressionar Ctrl+c para cancelar"
+
+if [ -z $deletar ]
+ then
+echo "Digite o número da linha"
+ read deletar
+fi
+done
+
+
+
+if [[ "$deletar" =~ (^[0-9]{1,3}?$) ]]
+ then
+	echo "A linha número $deletar foi apagada"
+	echo "A nova agenda é:"
+touch . lista.tmp
+	sort lista_ag | sed -e $deletar'd'| sort > lista.tmp
+mv lista.tmp lista_ag
+sort lista_ag | nl
+echo "Pressione Shift+PgUp ou Shift+PgDn para ver a nova lista"
+
+else
+	echo "Ops! Você não digitou um número ou um número elevado."
+
+fi
+}
+
+if [ -f lista_ag ]; then
+clear
+else
+clear
+touch . lista_ag
+fi
+
+select opcao in "Listar agenda" \
+"Agendar" \
+"Procurar" \
+"Editar" \
+"Apagar" \
+"Fechar"
+
+do
+ case $opcao in
+"Listar agenda")
+	listar;;
+"Agendar")
+	adicionar;;
+"Procurar")
+	procurar;;
+"Editar")
+	editar;;
+"Apagar")
+	apagar;;
+"Fechar")
+	break;;
+*)
+  echo "Escolha não disponível";;
+  esac
+done
